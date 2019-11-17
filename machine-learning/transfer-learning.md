@@ -30,12 +30,6 @@
 
 在一种数据上学习到的知识和经验，也是可以应用到另外一类数据上的，这也是从人的学习模式上借鉴过来的：比如一个人精通文学经典的学者和一个没读过书的文盲，让他们同时去阅读科技类的文章，很显然前者的效果肯定是更好一点。
 
-
-
-
-
-
-
 参考文章：
 
 [为什么迁移学习好用？](https://www.quora.com/Why-does-transfer-learning-works-Is-it-because-the-source-and-the-target-task-are-similar-Or-is-it-because-the-dataset-used-in-source-task-is-good-enough-that-its-representation-can-be-used-to-discover-patterns-from)
