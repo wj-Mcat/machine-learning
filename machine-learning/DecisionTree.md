@@ -63,3 +63,10 @@ def TreeGenerate(D,A):
 - 信息增益越大，使用该属性来划分所得到的**纯度提升**也就越大。
 
 - 
+
+
+
+## 问题测试
+
+- [30 Questions to test a data scientist on Tree Based Models]( https://www.analyticsvidhya.com/blog/2017/09/30-questions-test-tree-based-models/ )
+- [226 questions with answers in Decision Trees](https://www.researchgate.net/topic/Decision-Trees)
