@@ -5,8 +5,9 @@
 
 ## 自然语言处理
 
-- [text-classification-using-cnn-rnn-han](./nenural-language-processing/text-classification/report.md)
-- [text-cnn](./nenural-language-processing/text-classification/textcnn.md)
+- [text-classification-using-cnn-rnn-han](./nlp/text-classification/report.md)
+- [text-cnn](./nlp/text-classification/textcnn.md)
+- [A Novel Bi-directional Interrelated Model for Joint Intent Detection and Slot Filling](./nlp/slot_filling_intent_detection/A_Novel_Bi-directional_Interrelated_Model_for_Join.md)
 
 ## 机器学习
 

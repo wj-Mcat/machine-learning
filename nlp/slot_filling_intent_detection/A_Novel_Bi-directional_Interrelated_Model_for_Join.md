@@ -1,14 +1,14 @@
 # [A Novel Bi-directional Interrelated Model for Joint Intent Detection and Slot Filling](http://arxiv.org/abs/1907.00390)
 
-> tensorflow: [github](https://github.com/ZephyrChenzf/SF-ID-Network-For-NLU)
+> code -> tensorflow: [github](https://github.com/ZephyrChenzf/SF-ID-Network-For-NLU)
 
-## 介绍
+## 一、介绍
 
 该论文中提出了一个基于Attention的联合模型，能够加强Slot Filling 和 Intent Detection 之间的有向连接，当时在ATIS数据集上取得了SOTA的效果。
 
 > 注意这里是有向连接，因此也是有双向连接。因为SF和ID之间是存在相互依赖关系，单向依赖和双向依赖都能够加强信息建模。
 
-## 模型
+## 二、模型
 
 ![](./asserts/bi-sf-id.png)
 
@@ -33,7 +33,7 @@ $$
 
 `IntentDetection`的上下文向量的计算方法与`SF`是一致的，那也就说明 shape($c_{slot}$) = shape($c_{int}$)。虽然获取方法是一致的，可使用的渠道不一样，为两个独立的注意力机制，提取的特征是不一样的。
 
-## SF-ID网络架构
+## 三、SF-ID网络架构
 
 前面提到过`SF subnet`和`ID subnet`自网络是有向连接，也就会存在`SF-First`和`ID-First`这两种模式。前一个网络会将输出的隐藏层信息传递给后一层，这样就会建立一种依赖性关系。
 
@@ -123,11 +123,11 @@ $$
 
 当然该结果还是要输入给CRF来作为最终的预测。
 
-## ID-First
+## 四、ID-First
 
 这种模式下与`SF-First`是有一些区别的。
 
-### ID-Subnet
+### 4.1 ID-Subnet
 
 增强向量$r$的获取需要联合`BiLSTM`和$c_{slot}$上下文向量。
 
@@ -139,7 +139,7 @@ e_{i, j}=W * \sigma\left(V_{1} * h_{i}+V_{2} * c_{s l o t}^{j}+b\right)
 \end{array}
 $$
 
-### SF-Subnet
+### 4.2 SF-Subnet
 
 $r_{int}$作为输入传递给`ID-Subnet`，增强因子$f$的计算公式没变。
 
@@ -147,6 +147,7 @@ $r_{int}$作为输入传递给`ID-Subnet`，增强因子$f$的计算公式没变
 
 两个子网络的交互逻辑也是一样的，我就不再赘述。
 
-## CRF 层
+## 五、CRF 层
 
 SlotFilling 是一个序列标注任务，CRF能够在全局下获取最大似然估计，获得更好的效果，将此用在`SF-Subnet`最后一层再好不过。同时经过实验证明有效。
+
