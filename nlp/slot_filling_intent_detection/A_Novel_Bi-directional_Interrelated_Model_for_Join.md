@@ -1,6 +1,6 @@
 # [A Novel Bi-directional Interrelated Model for Joint Intent Detection and Slot Filling](http://arxiv.org/abs/1907.00390)
 
-> code -> tensorflow: [github](https://github.com/ZephyrChenzf/SF-ID-Network-For-NLU)
+> 只讲解不给代码的人，都是耍流氓
 
 ## 一、介绍
 
@@ -151,3 +151,191 @@ $r_{int}$作为输入传递给`ID-Subnet`，增强因子$f$的计算公式没变
 
 SlotFilling 是一个序列标注任务，CRF能够在全局下获取最大似然估计，获得更好的效果，将此用在`SF-Subnet`最后一层再好不过。同时经过实验证明有效。
 
+## 六、代码解剖
+
+超参数预设：
+
+```python
+import torch
+batch_size, seq_len, hidden_size, emb_dim = 64, 67, 128, 200
+
+inp = torch.randn(batch)
+```
+
+### SlotAttention
+
+```python
+
+class SlotAttention(nn.Module):
+    """
+    SlotAttention : external attention mechanism
+    """
+    def __init__(self, hidden_size=128):
+        super(SlotAttention, self).__init__()
+        self.attention = nn.Linear(hidden_size, hidden_size)
+
+    def forward(self, x):
+        """
+        x: hidden states from LSTM (batch_size, seq_len, hidden_size)
+
+        :return: slot attention context tensor (batch_size, seq_len, hidden_size)
+
+        core formula:
+            attention = softmax(x * linear(x)) * x
+
+        """
+        weights = self.attention(x)
+
+        # -> (batch_size, hidden_size, hidden_size)
+        weights = torch.matmul(weights, torch.transpose(x, 1, 2))
+
+        # softmax on the final axis
+        weights = F.softmax(weights, dim=2)
+
+        output = torch.matmul(weights, x)
+        return output
+```
+
+### IntentAttention
+
+```python
+class IntentAttention(nn.Module):
+    """
+    IntentAttention : external attention mechanism
+    """
+    def __init__(self, hidden_size=64):
+        super(IntentAttention, self).__init__()
+        self.attention = nn.Linear(hidden_size, hidden_size)
+
+    def forward(self, x):
+        """
+        x: hidden states from LSTM (batch_size, seq_len, hidden_size)
+
+        :return: slot attention context tensor (batch_size, seq_len, hidden_size)
+
+        core formula:
+            attention = sum(softmax(x * linear(x)) * x, dim=1)
+
+        difference which between slot and intent is that softmax on final layer,
+        but sum on second (sqe_len) layer
+        """
+        # (batch_size, seq_len, hidden_size)
+        weights = self.attention(x)
+
+        # (batch_size, seq_len, seq_len)
+        weights = torch.matmul(weights, torch.transpose(x, 1, 2))
+
+        # softmax on final layer
+        weights = F.softmax(weights, dim=2)
+
+        output = torch.matmul(weights, x)
+
+        # sum on second layer
+        output = torch.sum(output, dim=1)
+
+        return output
+
+```
+
+这是在github找的解决方案，可是感觉与所指论文中的不一致，如果知友们有正确的解决方案请在评论区留言，或者私信我，我好对文章做修改。
+
+这个使用的是外部注意力机制。
+
+### SF-Subnet
+
+- formula
+
+$$
+f=\sum V * \tanh \left(c_{s l o t}^{i}+W * c_{i n t e}\right)
+$$
+
+$$
+r_{\text {slot}}^{i}=f \cdot c_{\text {slot}}^{i}
+$$
+
+- code
+  - 细节版本
+  
+    ```python
+    def sf_subnet():
+        f = []
+        for i in range(c_slot.shape[1]):
+
+            # [batch_size, hidden_size]
+            state = torch.tanh(c_slot[:, i, :] + W_SF(c_intent))
+
+            # [batch_size, hidden_size]
+            state = V_SF(state)
+            f.append(state)
+
+        # [batch_size, hidden_size]
+        f = torch.stack(f, dim=1).sum(dim=1)
+
+        r_slot = []
+        for i in range(c_slot.shape[1]):
+            r_slot_i = f * c_slot[:, i, :]
+            r_slot.append(r_slot_i)
+        r_slot = torch.stack(r_slot, dim=1)
+        return r_slot
+    ```
+
+  - 简化版本
+
+    ```python
+    f = torch.tanh(c_slot + self.W_SF(r_inte).unsqueeze(1))
+
+    # [batch_size, seq_len, hid_size]
+    f = self.V_SF(f)
+
+    # [batch_size, hid_size]
+    # sum on seq_len
+    f = torch.sum(f, dim=1)
+
+    # [batch_size, seq_len, hid_size]
+    r_slot = f.unsqueeze(1) * c_slot
+    ```
+
+### ID-Subnet
+
+- formula
+
+$$
+\begin{array}{c}
+\alpha_{i}=\frac{\exp \left(e_{i, i}\right)}{\sum_{j=1}^{T} \exp \left(e_{i, j}\right)} \\
+e_{i, j}=W * \tanh \left(V_{1} * r_{\text {slot}}^{i}+V_{2} * h_{j}+b\right)
+\end{array}
+$$
+
+- code
+
+  - 细节版本
+    ```python
+
+    W_ID = torch.nn.Linear(hidden_size, 1)
+
+    def id_subnet():
+        """
+        slot_features : [batch_size, seq_len, hidden_size]
+        hidden_features : [batch_size, seq_len, hidden_size]
+
+        :return alphas: [batch_size, seq_len]
+        """
+        # [batch_size, seq_len]
+        alphas = []
+        for i in range(slot_features.shape[1]):
+            es = []
+            for j in range(slot_features.shape[1]):
+                # [batch_size]
+                e_i_j = W_ID(torch.tanh(slot_features[:, i, :] + hid_features[:, j, :])).squeeze(dim=-1)
+                es.append(e_i_j)
+            # [batch_size, seq_len]
+            es = torch.stack(es, dim=1)
+            a_i = torch.softmax(es, dim=1)
+            alphas.append(a_i[:, i])s
+        alphas = torch.stack(alphas, dim=1)
+        return alphas
+    ```
+
+核心的公式和代码都展示完了，各位看官自行理解，我相信代码就不需要我来解释了，毕竟`code is a doc`。
+
+> code -> tensorflow: [github](https://github.com/ZephyrChenzf/SF-ID-Network-For-NLU)
