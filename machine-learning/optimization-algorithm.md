@@ -59,4 +59,5 @@ $$
 
 - [An overview of gradient descent optimization algorithms](http://arxiv.org/abs/1609.04747)
 - [Gradient Descent based Optimization Algorithms for Deep Learning Models Training](http://arxiv.org/abs/1903.03614)
-
+- [Stanford - cs231n - optimization](https://cs231n.github.io/optimization-1/)
+- [Stanford - cs231n - neural-network](https://cs231n.github.io/neural-networks-3/)
