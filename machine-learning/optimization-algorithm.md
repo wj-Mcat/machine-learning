@@ -293,9 +293,45 @@ $$
 
 在实际的训练过程中，梯度的更新只是一方面，为了让学习快速收敛，获得更好的效果也还有一些其他策略，如下我将一一介绍：
 
-### 6.1 数据打乱
+### 6.1 stuffling
 
-在训练的过程中，如果数据很整齐，那每次学习到的特征都是与某一个特征相关，会让学习效果有所偏差，
+在训练的过程中，如果数据很整齐，那每次学习到的特征都是与某一个特征相关，会让学习效果有所偏差。所以一般在训练的过程中，推荐要将数据打乱，这样才能够更好的实现泛化能力，而且这也是目前主流的方式。
+
+不过，在Curriculum Learning中，将数据根据特征进行排序，能够获得非常好的效果。
+
+### 6.2 batch normalization
+
+如果神经网络中的参数分布非常稀疏，方差较大，将会降低训练效果，且随着神经网络层数的增加，很可能会导致梯度爆炸问题。如果能将所有参数都给归一化到正态分布下，实验证明能够有效加速收敛速度。
+
+如果我们将batch normalization 作为神经网络中的一部分，那就可以使用较大的学习率。同时也发挥着正则化和dropout的作用。
+
+### 6.3 early stopping
+
+ Geoff Hinton 教授也说过，“Early stopping (is) beautiful free lunch”。如果在验证集上损失一直比训练集上差，实际上就没有必要再继续训练下去了。
+
+### 6.4 gradient noise
+
+在梯度更新时，对梯度添加上高斯噪音$N\left(0, \sigma_{t}^{2}\right)$，能够有效提升泛化能力。
+$$
+g_{t, i}=g_{t, i}+N\left(0, \sigma_{t}^{2}\right)
+$$
+而方差的生成策略如下：
+$$
+\sigma_{t}^{2}=\frac{\eta}{(1+t)^{\gamma}}
+$$
+实验证明加上这个高斯噪音，能够提升网络中的鲁棒性，也能够允许网络更深更复杂。所以作者猜测，添加上这些噪声之后能够使梯度在计算时，寻找到新的全局最优（比之前的全局最优还要好）。
+
+这个方法常用在深层次的神经网络中。
+
+## 七、结论
+
+在这篇文章中，主要介绍了三种梯度下降方法：
+
+- Batch Gradient Descent
+- Stochastic gradient descent
+- Mini-batch gradient descent
+
+其中mini-batch gradient descent是最流行的，也是目前学术界和工业界使用最广泛的。另外也提出了对于SGD算法优化算法：Momentum, Nesterov accelerated gradient, Adagrad, Adadelta, RMSprop, Adam。最后还介绍了优化SGD算法中的其他优化策略： shufflfling and curriculum learning，batch normalization, and early stopping。
 
 
 
