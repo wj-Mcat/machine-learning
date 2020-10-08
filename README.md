@@ -32,7 +32,18 @@
 
 ## 杂文
 
+## 代码片段
 
+- [tensorflow](./code_snippet/tensorflow)
+    - [基础](code_snippet/tensorflow/tensorflow.md)
+    - [bilstm](./code_snippet/models/biLSTM.md)
+    - [text-cnn](./code_snippet/models/text-cnn.md)
+- [python](./code_snippet/python/)
+    - [Blocking IO](./code_snippet/python/blocking_io.md)
+    - [Shell Command in Python](./code_snippet/python/command.md)
+    - [tf.keras](./code_snippet/python/keras.md)
+    - [pandas](./code_snippet/python/pandas.md)
+    - [sklearn](./code_snippet/python/sklearn.md)
 
 # 经典学习资料 + paper
 
