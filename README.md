@@ -1,4 +1,6 @@
-![](https://www.ostraining.com/cdn/images/drupal/show-code-with-codesnippet.jpg)
+![](https://i.etsystatic.com/18126112/r/il/72a520/1630553245/il_1588xN.1630553245_j8yt.jpg)
+
+> [图片来源](https://www.etsy.com/pl/listing/634770383/son-goku-ultra-instinct-pixel-art)
 
 # 重点文章
 
