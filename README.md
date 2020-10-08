@@ -1,3 +1,5 @@
+![](https://www.ostraining.com/cdn/images/drupal/show-code-with-codesnippet.jpg)
+
 # 重点文章
 
 ## 学习方法
