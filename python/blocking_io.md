@@ -1,3 +1,6 @@
+
+![](https://files.realpython.com/media/A-Complete-Walkthrough-of-Pythons-Asyncio_Watermarked.5b6b9a01fdc9.jpg)
+
 # 如何在协程中嵌入阻塞函数
  
 ## 应用场景
